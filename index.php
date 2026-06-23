@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+include 'db.php';
+
 // 1. Dapatkan nama group daripada URL parameter atau nama folder semasa
 if (!isset($_GET['group'])) {
     $group = basename(dirname(__FILE__));

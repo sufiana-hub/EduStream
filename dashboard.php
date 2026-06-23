@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+include 'db.php';
+
 // Get group name from URL or folder just like the lecturer's code
 if (!isset($_GET['group'])) {
     $group = basename(dirname(__FILE__));
