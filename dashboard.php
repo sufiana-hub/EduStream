@@ -1,17 +1,15 @@
 <?php
 session_start();
 
-include 'db.php';
+// Ensure your db.php file is in the SAME folder as this file
+// include 'db.php'; 
 
-// Get group name from URL or folder just like the lecturer's code
+// Get group name from URL or folder
 if (!isset($_GET['group'])) {
     $group = basename(dirname(__FILE__));
 } else {
     $group = preg_replace('/[^a-zA-Z0-9]/', '', $_GET['group']);
 }
-
-// In a real scenario, you would include your DB connection here to fetch real counts
-// include '../../db.php'; 
 
 // Mock data based on your PDF Progress Report
 $total_groups = 5;
@@ -45,7 +43,7 @@ $recent_assets = [
         .stat-title { font-size: 1rem; color: #aaa; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
         .stat-value { font-size: 2.5rem; font-weight: bold; color: white; }
 
-        /* Table Styling (Adapted from lecturer's code) */
+        /* Table Styling */
         .section-title { font-size: 1.5rem; margin-bottom: 20px; color: white; }
         .table-container { border: 1px solid #444; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.02); }
         table { width: 100%; border-collapse: collapse; text-align: left; }
@@ -103,7 +101,7 @@ $recent_assets = [
     <table>
         <thead>
             <tr>
-                <th>Asset ID</th>
+                <th>#</th> <th>Asset ID</th>
                 <th>Title</th>
                 <th>Group</th>
                 <th>File Type</th>
@@ -111,8 +109,12 @@ $recent_assets = [
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($recent_assets as $asset): ?>
+            <?php 
+            $counter = 1; // Initialized the counter here
+            foreach ($recent_assets as $asset): 
+            ?>
                 <tr>
+                    <td style="color: #aaa; font-weight: bold;"><?php echo $counter++; ?></td>
                     <td style="color: #00d2ff; font-family: monospace; font-weight: bold;"><?php echo htmlspecialchars($asset['id']); ?></td>
                     <td><?php echo htmlspecialchars($asset['title']); ?></td>
                     <td><?php echo htmlspecialchars($asset['group']); ?></td>
