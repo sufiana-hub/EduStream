@@ -1,8 +1,6 @@
 <?php
 session_start();
 
-include 'db.php';
-
 // 1. Dapatkan nama group daripada URL parameter atau nama folder semasa
 if (!isset($_GET['group'])) {
     $group = basename(dirname(__FILE__));
@@ -10,8 +8,8 @@ if (!isset($_GET['group'])) {
     $group = preg_replace('/[^a-zA-Z0-9]/', '', $_GET['group']);
 }
 
-// 2. Panggil db.php (Naik 2 tingkat ke atas untuk ke folder 'All')
-include '../../db.php'; 
+// 2. Panggil db.php (FIXED: Removed the ../../ so it looks in the same folder)
+include 'db.php'; 
 
 // 3. Ambil data full_name dan matric_no sahaja menggunakan INNER JOIN
 $members = [];
@@ -98,7 +96,7 @@ $conn->close();
     </table>
 </div>
 
-<a href="../../dashboard.php?group=<?php echo urlencode($group); ?>" class="btn-back">BACK TO DASHBOARD</a>
+<a href="dashboard.php?group=<?php echo urlencode($group); ?>" class="btn-back">BACK TO DASHBOARD</a>
 
 </body>
 </html>
