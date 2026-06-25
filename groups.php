@@ -1,9 +1,8 @@
 <?php
-session_start();
 include 'db.php';
 
 // Check if a new group is being submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_group'])) {
+if (($_SERVER["REQUEST_METHOD"] ?? '') == "POST" && isset($_POST['add_group'])) {
     $group_id = $_POST['group_id'];
     $group_name = $_POST['group_name'];
 
@@ -72,6 +71,8 @@ if ($result) {
     <a href="groups.php" class="nav-btn active">Groups Management</a>
     <a href="assets.php" class="nav-btn">Assets Management</a>
     <a href="tags.php" class="nav-btn">Tags Management</a>
+    <a href="keyword_extractor.php" class="nav-btn">Keyword Extractor</a>
+    <a href="search.php" class="nav-btn">Search</a>
     <a href="index.php" class="nav-btn" style="margin-left: auto;">View Members List</a>
 </div>
 

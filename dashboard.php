@@ -1,8 +1,7 @@
 <?php
-session_start();
 
-// Ensure your db.php file is in the SAME folder as this file
-// include 'db.php'; 
+include 'db.php';
+include 'keyword_utils.php';
 
 // Get group name from URL or folder
 if (!isset($_GET['group'])) {
@@ -11,16 +10,24 @@ if (!isset($_GET['group'])) {
     $group = preg_replace('/[^a-zA-Z0-9]/', '', $_GET['group']);
 }
 
-// Mock data based on your PDF Progress Report
-$total_groups = 5;
-$total_assets = 24;
-$total_specs = 24;
-$total_tags = 12;
+function getCount($conn, $sql) {
+    $result = $conn->query($sql);
+    $row = $result ? $result->fetch_row() : [0];
+    return (int) ($row[0] ?? 0);
+}
 
-$recent_assets = [
-    ['id' => 'A001', 'title' => 'Safety Video', 'group' => 'GW09', 'type' => 'MP4', 'mandatory' => 'Yes'],
-    ['id' => 'A002', 'title' => 'AI Ethics Notes', 'group' => 'GW09', 'type' => 'PDF', 'mandatory' => 'No']
-];
+$total_groups = getCount($conn, "SELECT COUNT(*) FROM groupdb");
+$total_assets = getCount($conn, "SELECT COUNT(*) FROM assets");
+$total_specs = getCount($conn, "SELECT COUNT(*) FROM assets WHERE file_size IS NOT NULL OR mime_type IS NOT NULL OR original_filename IS NOT NULL");
+$total_tags = getCount($conn, "SELECT COUNT(*) FROM tags");
+
+$recent_assets = [];
+$recent_result = $conn->query("SELECT asset_id, title, group_id, file_type, file_size, upload_date, mandatory FROM assets ORDER BY upload_date DESC, asset_id DESC LIMIT 5");
+if ($recent_result) {
+    while ($row = $recent_result->fetch_assoc()) {
+        $recent_assets[] = $row;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="ms">
@@ -74,6 +81,8 @@ $recent_assets = [
     <a href="groups.php" class="nav-btn">Groups Management</a>
     <a href="assets.php" class="nav-btn">Assets Management</a>
     <a href="tags.php" class="nav-btn">Tags Management</a>
+    <a href="keyword_extractor.php" class="nav-btn">Keyword Extractor</a>
+    <a href="search.php" class="nav-btn">Search</a>
     <a href="index.php" class="nav-btn" style="margin-left: auto;">View Members List</a>
 </div>
 
@@ -105,6 +114,8 @@ $recent_assets = [
                 <th>Title</th>
                 <th>Group</th>
                 <th>File Type</th>
+                <th>Size</th>
+                <th>Uploaded</th>
                 <th>Mandatory</th>
             </tr>
         </thead>
@@ -115,10 +126,12 @@ $recent_assets = [
             ?>
                 <tr>
                     <td style="color: #aaa; font-weight: bold;"><?php echo $counter++; ?></td>
-                    <td style="color: #00d2ff; font-family: monospace; font-weight: bold;"><?php echo htmlspecialchars($asset['id']); ?></td>
+                    <td style="color: #00d2ff; font-family: monospace; font-weight: bold;"><?php echo htmlspecialchars($asset['asset_id']); ?></td>
                     <td><?php echo htmlspecialchars($asset['title']); ?></td>
-                    <td><?php echo htmlspecialchars($asset['group']); ?></td>
-                    <td><?php echo htmlspecialchars($asset['type']); ?></td>
+                    <td><?php echo htmlspecialchars($asset['group_id']); ?></td>
+                    <td><?php echo htmlspecialchars($asset['file_type']); ?></td>
+                    <td><?php echo htmlspecialchars($asset['file_size'] ? formatUploadBytes($asset['file_size']) : '-'); ?></td>
+                    <td><?php echo htmlspecialchars($asset['upload_date'] ?: '-'); ?></td>
                     <td>
                         <span class="<?php echo $asset['mandatory'] === 'Yes' ? 'badge-yes' : 'badge-no'; ?>">
                             <?php echo htmlspecialchars($asset['mandatory']); ?>
@@ -126,6 +139,11 @@ $recent_assets = [
                     </td>
                 </tr>
             <?php endforeach; ?>
+            <?php if (empty($recent_assets)): ?>
+                <tr>
+                    <td colspan="8" style="text-align: center; color: #aaa;">No assets uploaded yet.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
 </div>

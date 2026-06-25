@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 // 1. Dapatkan nama group daripada URL parameter atau nama folder semasa
 if (!isset($_GET['group'])) {
